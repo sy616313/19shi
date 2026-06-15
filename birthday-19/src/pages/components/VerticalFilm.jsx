@@ -1,4 +1,4 @@
-﻿import { useRef } from "react";
+﻿import { useEffect, useRef } from "react";
 import "./VerticalFilm.css";
 
 const placeholderGradients = [
@@ -12,22 +12,63 @@ const placeholderGradients = [
   "linear-gradient(135deg, #263238 0%, #37474F 50%, #78909C 100%)",
 ];
 
-// Duplicate for seamless loop
+// Duplicate once = 16 frames total for seamless loop
 const frames = [...placeholderGradients, ...placeholderGradients];
 
 export default function VerticalFilm() {
   const trackRef = useRef(null);
+  const animRef = useRef(null);
+  const scrollRef = useRef(0);
+  const pausedRef = useRef(false);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const speed = 0.15; // pixels per frame
+
+    const animate = () => {
+      if (!pausedRef.current) {
+        scrollRef.current += speed;
+
+        // Total height of one set (8 frames) — reset seamlessly
+        const singleSetHeight = track.scrollHeight / 2;
+        if (scrollRef.current >= singleSetHeight) {
+          scrollRef.current -= singleSetHeight;
+        }
+
+        track.style.transform = `translateY(${-scrollRef.current}px)`;
+      }
+      animRef.current = requestAnimationFrame(animate);
+    };
+
+    const onEnter = () => { pausedRef.current = true; };
+    const onLeave = () => { pausedRef.current = false; };
+    track.addEventListener("mouseenter", onEnter);
+    track.addEventListener("mouseleave", onLeave);
+
+    animRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animRef.current);
+      track.removeEventListener("mouseenter", onEnter);
+      track.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
 
   return (
     <div className="vertical-film" aria-label="回忆胶卷">
       {/* Left sprocket holes */}
       <div className="vf-sprockets vf-sprockets-left" aria-hidden="true">
-        {Array.from({ length: 20 }, (_, i) => (
+        {Array.from({ length: 22 }, (_, i) => (
           <span key={`vl-${i}`} className="vf-hole" />
         ))}
       </div>
 
-      {/* Frames track */}
+      {/* Photo frames — JS-driven seamless scroll */}
       <div className="vf-track" ref={trackRef}>
         {frames.map((gradient, i) => (
           <div key={i} className="vf-frame">
@@ -43,7 +84,7 @@ export default function VerticalFilm() {
 
       {/* Right sprocket holes */}
       <div className="vf-sprockets vf-sprockets-right" aria-hidden="true">
-        {Array.from({ length: 20 }, (_, i) => (
+        {Array.from({ length: 22 }, (_, i) => (
           <span key={`vr-${i}`} className="vf-hole" />
         ))}
       </div>

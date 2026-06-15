@@ -1,87 +1,81 @@
-﻿/* ===== Vertical Film Strip ===== */
+﻿/* ===== Vertical Film Strip — JS-driven seamless scroll ===== */
 
 .vertical-film {
   position: relative;
-  width: 200px;
+  width: 50vw;
+  max-width: 520px;
   height: 100vh;
   display: flex;
   align-items: stretch;
-  background: linear-gradient(180deg, rgba(20,20,20,0.9) 0%, rgba(30,30,30,0.85) 50%, rgba(20,20,20,0.9) 100%);
-  border-left: 1px solid rgba(255,255,255,0.05);
+  background: linear-gradient(180deg, rgba(16,16,16,0.92) 0%, rgba(24,24,24,0.88) 50%, rgba(16,16,16,0.92) 100%);
+  border-left: 1px solid rgba(255,255,255,0.04);
   overflow: hidden;
 }
 
-/* Sprocket holes columns */
 .vf-sprockets {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 12px;
-  padding: 16px 6px;
-  width: 22px;
+  gap: 10px;
+  padding: 14px 4px;
+  width: 16px;
   flex-shrink: 0;
   z-index: 2;
 }
 
 .vf-hole {
   display: block;
-  width: 8px;
-  height: 8px;
-  min-height: 8px;
+  width: 7px;
+  height: 7px;
+  min-height: 7px;
   flex-shrink: 0;
-  background: radial-gradient(circle, #2a2a2a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  background: radial-gradient(circle, #333 0%, #1a1a1a 50%, #0a0a0a 100%);
   border-radius: 50%;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #1f1f1f;
 }
 
-.vf-sprockets-left { border-right: 1px solid rgba(255,255,255,0.03); }
-.vf-sprockets-right { border-left: 1px solid rgba(255,255,255,0.03); padding-right: 10px; }
+.vf-sprockets-left { border-right: 1px solid rgba(255,255,255,0.02); }
+.vf-sprockets-right { border-left: 1px solid rgba(255,255,255,0.02); }
 
-/* Frames track - vertical scroll */
+/* Frames track — JS drives scroll, no CSS animation */
 .vf-track {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 20px 8px;
-  animation: vfScrollVertical 24s linear infinite;
-  overflow: hidden;
-}
-
-.vertical-film:hover .vf-track {
-  animation-play-state: paused;
-}
-
-@keyframes vfScrollVertical {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-50%); }
+  gap: 3vh;
+  padding: 2vh 10px;
+  will-change: transform;
 }
 
 /* Single frame */
 .vf-frame {
   flex-shrink: 0;
-  width: 130px;
-  height: 96px;
+  width: calc(100% - 8px);
+  height: 28vh;
+  max-height: 260px;
   background: #0a0a0a;
-  border-radius: 4px;
-  padding: 4px;
+  border-radius: 6px;
+  padding: 5px;
   box-shadow:
-    0 2px 8px rgba(0,0,0,0.5),
-    inset 0 0 0 1px rgba(255,255,255,0.04);
-  transition: transform var(--transition-fast);
+    0 3px 12px rgba(0,0,0,0.5),
+    inset 0 0 0 1px rgba(255,255,255,0.03);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .vf-frame:hover {
-  transform: scale(1.04);
+  transform: scale(1.03);
+  box-shadow:
+    0 6px 24px rgba(0,0,0,0.6),
+    inset 0 0 0 1px rgba(255,255,255,0.06);
   z-index: 2;
 }
 
 .vf-photo {
   width: 100%;
   height: 100%;
-  border-radius: 2px;
+  border-radius: 3px;
   position: relative;
   overflow: hidden;
 }
@@ -91,48 +85,53 @@
   inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(255,255,255,0.05) 0%,
+    rgba(255,255,255,0.04) 0%,
     transparent 50%,
-    rgba(0,0,0,0.1) 100%
+    rgba(0,0,0,0.08) 100%
   );
   pointer-events: none;
 }
 
 .vf-frame-num {
   position: absolute;
-  bottom: 2px;
-  right: 4px;
-  font-size: 7px;
+  bottom: 4px;
+  right: 6px;
+  font-size: 9px;
   font-family: "Courier New", monospace;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.3);
   letter-spacing: 1px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-/* Vignette top/bottom */
+/* Top/bottom vignette */
 .vertical-film::before,
 .vertical-film::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  height: 40px;
+  height: 50px;
   z-index: 3;
   pointer-events: none;
 }
-
 .vertical-film::before {
   top: 0;
-  background: linear-gradient(180deg, rgba(20,20,20,0.9) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(16,16,16,0.95) 0%, transparent 100%);
 }
-
 .vertical-film::after {
   bottom: 0;
-  background: linear-gradient(0deg, rgba(20,20,20,0.9) 0%, transparent 100%);
+  background: linear-gradient(0deg, rgba(16,16,16,0.95) 0%, transparent 100%);
 }
 
 @media (max-width: 768px) {
-  .vertical-film { width: 150px; }
-  .vf-frame { width: 100px; height: 74px; }
-  .vf-sprockets { width: 18px; padding: 12px 4px; gap: 10px; }
-  .vf-hole { width: 6px; height: 6px; min-height: 6px; }
+  .vertical-film { width: 45vw; max-width: 300px; }
+  .vf-frame { height: 24vh; max-height: 200px; }
+  .vf-sprockets { width: 12px; padding: 10px 2px; gap: 8px; }
+  .vf-hole { width: 5px; height: 5px; min-height: 5px; }
+  .vf-track { gap: 2vh; padding: 1.5vh 6px; }
+}
+
+@media (max-width: 480px) {
+  .vertical-film { width: 42vw; }
+  .vf-frame { height: 22vh; }
 }
