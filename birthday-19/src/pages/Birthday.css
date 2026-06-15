@@ -1,4 +1,4 @@
-﻿/* ===== Starry Birthday - Minimal Initial / Split After Blow ===== */
+﻿/* ===== Starry Birthday - Full Flow ===== */
 
 .birthday-page {
   display: flex;
@@ -11,12 +11,76 @@
   transition: justify-content 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* After blow: left-align cake + film on right */
 .birthday-page.split {
   justify-content: flex-start;
 }
 
-/* Cake wrapper - slides left */
+/* ===== Guide Overlay ===== */
+.guide-overlay {
+  position: fixed;
+  bottom: 18vh;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  z-index: 30;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.guide-overlay.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.guide-text {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: #FDE68A;
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.5),
+               0 0 40px rgba(245, 158, 11, 0.2);
+  letter-spacing: 0.05em;
+  animation: guidePulse 2.5s ease-in-out infinite;
+  line-height: 1.6;
+}
+
+.guide-sub {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 8px;
+  letter-spacing: 0.03em;
+}
+
+@keyframes guidePulse {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+/* ===== Mic Indicator ===== */
+.mic-indicator {
+  position: fixed;
+  bottom: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 80px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  z-index: 25;
+  overflow: hidden;
+}
+
+.mic-bar {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #F59E0B 0%, #EC4899 100%);
+  border-radius: 2px;
+  transition: height 0.1s ease-out;
+}
+
+/* ===== Cake wrapper ===== */
 .cake-stage {
   display: flex;
   align-items: center;
@@ -31,7 +95,7 @@
   margin-right: 0;
 }
 
-/* Film strip wrapper - fades in on right */
+/* ===== Film strip ===== */
 .film-stage {
   position: absolute;
   right: 0;
@@ -53,7 +117,7 @@
   pointer-events: auto;
 }
 
-/* Dark overlay */
+/* ===== Dark overlay ===== */
 .birthday-overlay {
   position: fixed;
   inset: 0;
@@ -71,8 +135,28 @@
   background: rgba(6, 6, 15, 0);
 }
 
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
   .cake-stage.shifted {
     margin-left: 4vw;
+  }
+
+  .guide-text {
+    font-size: 1.05rem;
+  }
+
+  .guide-overlay {
+    bottom: 22vh;
+  }
+
+  .mic-indicator {
+    bottom: 8vh;
+    height: 50px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guide-text {
+    animation: none;
   }
 }
