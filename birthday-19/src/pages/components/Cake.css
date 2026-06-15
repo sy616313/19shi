@@ -1,0 +1,243 @@
+﻿/* ===== Starry Sky Cake - Larger ===== */
+
+.cake-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0 10px;
+}
+
+/* Ambient candle glow */
+.candle-ambient-glow {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translate(
+    calc((var(--mx, 0.5) - 0.5) * 40px),
+    calc((var(--my, 0.5) - 0.5) * 30px)
+  );
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 50% 45%,
+    rgba(245, 158, 11, 0.22) 0%,
+    rgba(245, 158, 11, 0.06) 35%,
+    transparent 70%
+  );
+  filter: blur(24px);
+  pointer-events: none;
+  z-index: 0;
+  transition: transform 0.3s ease-out;
+}
+
+/* Stand / Plate */
+.cake-stand {
+  width: 260px;
+  height: 10px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), rgba(255,255,255,0.14), rgba(255,255,255,0.08), transparent);
+  border-radius: 50%;
+  margin-bottom: 2px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+
+/* Cake body wrapper */
+.cake-body {
+  position: relative;
+  width: 230px;
+  height: 178px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Bottom frosting */
+.cake-frosting-bottom {
+  position: absolute;
+  bottom: 0;
+  width: 220px;
+  height: 28px;
+  background:
+    radial-gradient(ellipse 22px 18px at 18px 50%, #F472B6 0%, transparent 70%),
+    radial-gradient(ellipse 24px 19px at 55px 55%, #EC4899 0%, transparent 70%),
+    radial-gradient(ellipse 22px 18px at 95px 50%, #F472B6 0%, transparent 70%),
+    radial-gradient(ellipse 24px 19px at 135px 55%, #DB2777 0%, transparent 70%),
+    radial-gradient(ellipse 22px 18px at 175px 50%, #F472B6 0%, transparent 70%),
+    radial-gradient(ellipse 22px 18px at 205px 52%, #EC4899 0%, transparent 70%),
+    linear-gradient(180deg, #F472B6, #EC4899);
+  border-radius: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+/* Main cake layer */
+.cake-layer {
+  position: absolute;
+  bottom: 8px;
+  width: 204px;
+  height: 92px;
+  background: linear-gradient(
+    180deg,
+    #FCE7F3 0%,
+    #FBCFE8 25%,
+    #F9A8D4 60%,
+    #F472B6 100%
+  );
+  border-radius: 24px 24px 10px 10px;
+  box-shadow:
+    inset 0 5px 14px rgba(255,255,255,0.15),
+    0 5px 14px rgba(0,0,0,0.3);
+}
+
+/* Top cream */
+.cake-cream-top {
+  position: absolute;
+  bottom: 90px;
+  width: 210px;
+  height: 34px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.cream-swirl {
+  width: 30px;
+  height: 28px;
+  background: #FDF2F8;
+  border-radius: 50% 50% 40% 40%;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.12), inset 0 3px 5px rgba(255,255,255,0.5);
+}
+
+.cream-swirl-1, .cream-swirl-5 { height: 20px; width: 24px; }
+.cream-swirl-3 { height: 30px; width: 34px; background: #FFF5F9; }
+
+/* Strawberry slices */
+.strawberry-slice {
+  position: absolute;
+  width: 26px;
+  height: 18px;
+  background: linear-gradient(180deg, #EF5350 0%, #C62828 100%);
+  border-radius: 50px 50px 5px 5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  z-index: 3;
+}
+.strawberry-slice::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 8px;
+  width: 10px;
+  height: 3px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 1px;
+}
+
+.strawberry-s1 { top: 62px; left: 18px; transform: rotate(-20deg); }
+.strawberry-s2 { top: 56px; left: 54px; transform: rotate(8deg); width: 28px; }
+.strawberry-s3 { top: 58px; right: 16px; transform: rotate(25deg); }
+
+/* Sprinkles */
+.sprinkle {
+  position: absolute;
+  width: 8px;
+  height: 3px;
+  border-radius: 2px;
+  z-index: 3;
+}
+.sprinkle-1 { top: 52px; left: 42px; background: #FDE68A; transform: rotate(30deg); }
+.sprinkle-2 { top: 48px; left: 76px; background: #A5F3FC; transform: rotate(-45deg); }
+.sprinkle-3 { top: 54px; left: 104px; background: #FDE68A; transform: rotate(15deg); }
+.sprinkle-4 { top: 46px; left: 130px; background: #F9A8D4; transform: rotate(-20deg); }
+.sprinkle-5 { top: 56px; left: 154px; background: #A5F3FC; transform: rotate(60deg); }
+.sprinkle-6 { top: 50px; left: 60px; background: #FDE68A; transform: rotate(-10deg); }
+
+/* ---- Candle ---- */
+.candle-container {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 18px 10px;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+
+.candle-container:hover { background: rgba(255,255,255,0.03); }
+.candle-container:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+.candle-stick {
+  width: 6px;
+  height: 36px;
+  background: linear-gradient(180deg, #FFF5EE 0%, #F0E0D0 50%, #E0C8B0 100%);
+  border-radius: 3px 3px 0 0;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
+  transition: all var(--transition-slow);
+}
+
+.candle-container.blown .candle-stick {
+  background: #A09080;
+  box-shadow: none;
+}
+
+.candle-wax-drip {
+  width: 3px;
+  height: 8px;
+  background: rgba(240, 224, 208, 0.6);
+  position: absolute;
+  top: 22px;
+  left: 56%;
+  border-radius: 0 0 1.5px 1.5px;
+}
+
+/* Flame */
+.candle-flame {
+  animation: flameFlicker 0.3s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.6)) drop-shadow(0 0 30px rgba(245, 158, 11, 0.3));
+  margin-bottom: -2px;
+  z-index: 11;
+}
+
+@keyframes flameFlicker {
+  0% { transform: scaleY(1) scaleX(1) rotate(-1deg); }
+  30% { transform: scaleY(1.06) scaleX(0.94) rotate(1.5deg); }
+  60% { transform: scaleY(0.94) scaleX(1.05) rotate(2deg); }
+  100% { transform: scaleY(1.02) scaleX(0.97) rotate(-1.5deg); }
+}
+
+/* Smoke */
+.smoke-wisp {
+  position: absolute;
+  top: -8px;
+  width: 5px;
+  height: 20px;
+  background: rgba(180, 170, 160, 0.3);
+  border-radius: 50%;
+  animation: smokeUp 2.5s ease-out forwards;
+}
+
+@keyframes smokeUp {
+  0% { opacity: 0.4; transform: translateY(0) scale(0.7); }
+  100% { opacity: 0; transform: translateY(-52px) scale(4); }
+}
+
+@media (max-width: 768px) {
+  .cake-body { width: 190px; height: 148px; }
+  .cake-layer { width: 168px; height: 76px; }
+  .cake-frosting-bottom { width: 182px; }
+  .cake-cream-top { width: 174px; bottom: 74px; }
+  .cream-swirl { width: 24px; height: 22px; }
+  .cream-swirl-3 { height: 24px; width: 28px; }
+  .candle-stick { height: 28px; }
+  .strawberry-slice { width: 22px; height: 15px; }
+  .strawberry-s1 { top: 52px; left: 14px; }
+  .strawberry-s2 { top: 46px; left: 44px; }
+  .strawberry-s3 { top: 48px; right: 12px; }
+  .candle-ambient-glow { width: 260px; height: 260px; }
+  .cake-stand { width: 210px; }
+}

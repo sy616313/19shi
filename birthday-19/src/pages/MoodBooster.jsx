@@ -1,0 +1,2 @@
+﻿import './Placeholder.css';
+export default function MoodBooster() { return (<div className="placeholder-page"><div className="placeholder-icon">🌸</div><div className="placeholder-title">心情缓和空间</div><div className="placeholder-subtitle">即将到来 — 呼吸引导 · 治愈语录 · 环境音效 · 情绪日记</div><div className="placeholder-cards">{['🌬️','💬','🎵','📝'].map((e,i)=><div key={i} className="placeholder-card">{e}</div>)}</div></div>); }
