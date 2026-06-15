@@ -8,11 +8,6 @@
   padding: 0;
   position: relative;
   z-index: 1;
-  transition: justify-content 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.birthday-page.split {
-  justify-content: flex-start;
 }
 
 /* ===== Guide Overlay ===== */
@@ -85,14 +80,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
-              margin 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.6s ease;
   z-index: 2;
-}
-
-.cake-stage.shifted {
-  margin-left: 8vw;
-  margin-right: 0;
 }
 
 /* ===== Film strip ===== */
@@ -124,11 +113,11 @@
   background: rgba(6, 6, 15, 0);
   pointer-events: none;
   z-index: 5;
-  transition: background 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.birthday-overlay.dim {
-  background: rgba(6, 6, 15, 0.55);
+.birthday-overlay.dark {
+  background: rgba(6, 6, 15, 0.88);
 }
 
 .birthday-overlay.lit {
@@ -137,10 +126,6 @@
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
-  .cake-stage.shifted {
-    margin-left: 4vw;
-  }
-
   .guide-text {
     font-size: 1.05rem;
   }

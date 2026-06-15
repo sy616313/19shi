@@ -1,72 +1,187 @@
-﻿.age-transition {
-  position: relative;
-  display: inline-flex;
+/* ===== Age Transition - Multi-phase Animation ===== */
+
+.age-transition {
+  position: fixed;
+  inset: 0;
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100px;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
 }
 
-.age-number {
-  font-size: 88px;
-  font-weight: 700;
-  line-height: 1;
+.age-transition.visible {
+  opacity: 1;
+}
+
+/* -- "19 生日快乐" as one group, same baseline -- */
+.age-group {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+/* -- Wrapper for number digits -- */
+.age-wrapper {
+  display: flex;
+  align-items: baseline;
+}
+
+/* -- Slot stacks 8 and 9 in same grid cell for perfect overlap -- */
+.age-digit-slot {
+  display: grid;
+  font-size: 120px;
+}
+
+.age-digit-slot > * {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+/* -- Digit base -- */
+.age-digit {
   font-family: var(--font-display);
-  transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(160deg, #FDE68A 0%, #F59E0B 30%, #EC4899 70%, #F472B6 100%);
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(160deg, #FDE68A 0%, #F59E0B 30%, #EC4899 60%, #F472B6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.age-number.old { position: absolute; }
-
-.age-number.old.fading {
-  opacity: 0;
-  transform: scale(1.2);
-  filter: blur(8px);
+/* -- "1" -- */
+.age-one {
+  font-size: 120px;
+  filter: drop-shadow(0 0 40px rgba(236, 72, 153, 0.5))
+          drop-shadow(0 0 80px rgba(245, 158, 11, 0.3));
 }
 
-.age-number.new {
+/* -- "8" and "9" morph animation -- */
+.age-eight,
+.age-nine {
+  font-size: 120px;
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+              filter 0.7s ease;
+}
+
+.age-eight {
   opacity: 1;
-  transform: scale(1);
-  font-size: 64px;
+  transform: scale(1) rotate(0deg);
+  filter: drop-shadow(0 0 40px rgba(236, 72, 153, 0.5))
+          drop-shadow(0 0 80px rgba(245, 158, 11, 0.3));
 }
 
-.age-number.new.hidden {
+.age-eight.morph-out {
   opacity: 0;
-  transform: scale(0.8);
-  filter: blur(4px);
+  transform: scale(0.4) rotate(15deg);
+  filter: blur(6px);
 }
 
-.birthday-text {
+.age-nine {
+  opacity: 0;
+  transform: scale(0.3) rotate(-15deg);
+  filter: blur(10px);
+}
+
+.age-nine.morph-in {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  filter: drop-shadow(0 0 40px rgba(236, 72, 153, 0.5))
+          drop-shadow(0 0 80px rgba(245, 158, 11, 0.3));
+}
+
+/* -- "生日快乐" greeting, shares baseline with digits -- */
+.birthday-greeting {
   font-family: var(--font-display);
-  font-size: 28px;
-  color: var(--color-text);
-  margin-left: 16px;
-  font-weight: 600;
+  font-size: 52px;
+  font-weight: 700;
+  color: #FDE68A;
+  letter-spacing: 6px;
+  white-space: nowrap;
   opacity: 0;
-  transform: translateX(-16px);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
-  letter-spacing: 4px;
-  text-shadow: 0 0 30px rgba(236, 72, 153, 0.4);
+  transform: translateY(10px);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.15s,
+              transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s,
+              text-shadow 1s ease;
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
 }
 
-.birthday-text.show {
+.birthday-greeting.show {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateY(0);
 }
 
-.hint-text {
-  font-size: 14px;
-  color: var(--color-text-muted);
-  margin-top: 10px;
-  opacity: 0.4;
-  font-style: italic;
-  letter-spacing: 2px;
-  animation: hintPulse 3s ease-in-out infinite;
+.birthday-greeting.glow {
+  text-shadow: 0 0 30px rgba(245, 158, 11, 0.6),
+               0 0 60px rgba(236, 72, 153, 0.4),
+               0 0 100px rgba(245, 158, 11, 0.2);
+  animation: greetingBreathe 3s ease-in-out infinite;
 }
 
-@keyframes hintPulse {
-  0%, 100% { opacity: 0.25; }
-  50% { opacity: 0.55; }
+@keyframes greetingBreathe {
+  0%, 100% {
+    text-shadow: 0 0 30px rgba(245, 158, 11, 0.6),
+                 0 0 60px rgba(236, 72, 153, 0.4);
+  }
+  50% {
+    text-shadow: 0 0 50px rgba(245, 158, 11, 0.8),
+                 0 0 100px rgba(236, 72, 153, 0.6),
+                 0 0 140px rgba(245, 158, 11, 0.3);
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .age-digit-slot,
+  .age-one,
+  .age-eight,
+  .age-nine {
+    font-size: 80px;
+  }
+
+  .birthday-greeting {
+    font-size: 36px;
+    letter-spacing: 4px;
+  }
+
+  .age-group {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .age-digit-slot,
+  .age-one,
+  .age-eight,
+  .age-nine {
+    font-size: 56px;
+  }
+
+  .birthday-greeting {
+    font-size: 26px;
+    letter-spacing: 2px;
+  }
+
+  .age-group {
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .age-digit,
+  .birthday-greeting {
+    transition: opacity 0.3s ease !important;
+  }
+
+  .age-eight.morph-out,
+  .age-nine.morph-in {
+    filter: none !important;
+  }
+
+  .birthday-greeting.glow {
+    animation: none !important;
+  }
 }
