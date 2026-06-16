@@ -1,11 +1,11 @@
-import { useEffect, useRef, useCallback } from "react";
+﻿import { useEffect, useRef, useCallback } from "react";
 
 /*
  * Photorealistic black & white starfield.
  * Visual parameters from qwen-vision analysis:
  *   - Pure B&W, extreme contrast, exponential glow falloff
  *   - Circular light points, slight cross diffraction on bright stars
- *   - Size grades: tiny at top → larger at bottom (perspective depth)
+ *   - Size grades: tiny at top 鈫?larger at bottom (perspective depth)
  *   - Dense horizontal band at lower 1/3 (star cluster / Milky Way core)
  *   - Nebula cloud textures in mid-lower area
  *   - Slight vignette (10-15% corner darkening)

@@ -95,4 +95,10 @@ body {
     height: 100vw;
     transform: translate(-50%, -50%) rotate(90deg);
   }
+
+  /* Canvas follows rotated layout */
+  canvas[aria-hidden="true"] {
+    position: absolute !important;
+  }
 }
+

@@ -1,4 +1,4 @@
-/* ===== Vertical Film Strip — 1:1 film replica (qwen params) ===== */
+﻿/* ===== Vertical Film Strip 鈥?1:1 film replica (qwen params) ===== */
 
 .vertical-film {
   position: relative;
@@ -7,7 +7,7 @@
   height: 100vh;
   display: flex;
   align-items: stretch;
-  /* Warm dark brown film base — matte with subtle highlight */
+  /* Warm dark brown film base 鈥?matte with subtle highlight */
   background: linear-gradient(
     180deg,
     #1A0E0E 0%,
@@ -52,7 +52,7 @@
 .vf-sprockets-left  { border-right: 1px solid rgba(255, 255, 255, 0.03); }
 .vf-sprockets-right { border-left:  1px solid rgba(255, 255, 255, 0.03); }
 
-/* Square sprocket hole — qwen: 8-10px square, rounded corners */
+/* Square sprocket hole 鈥?qwen: 8-10px square, rounded corners */
 .vf-hole {
   display: block;
   width: 9px;
@@ -71,7 +71,7 @@
   transition: box-shadow 0.3s ease;
 }
 
-/* ── Frames track — JS-driven vertical scroll ── */
+/* 鈹€鈹€ Frames track 鈥?JS-driven vertical scroll 鈹€鈹€ */
 .vf-track {
   flex: 1;
   display: flex;
@@ -82,7 +82,7 @@
   will-change: transform;
 }
 
-/* Single frame — thick border, embossed inset */
+/* Single frame 鈥?thick border, embossed inset */
 .vf-frame {
   flex-shrink: 0;
   width: calc(100% - 6px);
@@ -109,7 +109,7 @@
   z-index: 2;
 }
 
-/* Photo area — embossed inset look */
+/* Photo area 鈥?embossed inset look */
 .vf-photo {
   width: 100%;
   height: 100%;
@@ -120,7 +120,7 @@
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
-/* Photo overlay — subtle film sheen */
+/* Photo overlay 鈥?subtle film sheen */
 .vf-photo-overlay {
   position: absolute;
   inset: 0;
@@ -133,7 +133,7 @@
   pointer-events: none;
 }
 
-/* Frame number — film-style counter */
+/* Frame number 鈥?film-style counter */
 .vf-frame-num {
   position: absolute;
   bottom: 5px;
@@ -145,7 +145,7 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-/* ── Scratches — sparse white lines ── */
+/* 鈹€鈹€ Scratches 鈥?sparse white lines 鈹€鈹€ */
 .vf-scratches {
   position: absolute;
   inset: 0;
@@ -161,7 +161,7 @@
   transform: rotate(-2deg);
 }
 
-/* ── Bokeh light spots at bottom ── */
+/* 鈹€鈹€ Bokeh light spots at bottom 鈹€鈹€ */
 .vf-bokeh {
   position: absolute;
   bottom: 20px;
@@ -171,7 +171,7 @@
   filter: blur(8px);
 }
 
-/* ── Vignette ── */
+/* 鈹€鈹€ Vignette 鈹€鈹€ */
 .vertical-film::after {
   content: "";
   position: absolute;
@@ -199,7 +199,7 @@
   background: linear-gradient(180deg, rgba(18, 10, 10, 0.95) 0%, transparent 100%);
 }
 
-/* ── MotionCraft: responsive ── */
+/* 鈹€鈹€ MotionCraft: responsive 鈹€鈹€ */
 @media (max-width: 768px) {
   .vertical-film { width: 45vw; max-width: 300px; }
   .vf-frame { height: 24vh; max-height: 200px; padding: 5px; }
@@ -212,3 +212,39 @@
   .vertical-film { width: 42vw; }
   .vf-frame { height: 22vh; }
 }
+
+/* Mobile Portrait → Force Landscape fixes */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  .vertical-film {
+    width: 28vw;
+    max-width: 180px;
+    height: 100%;
+  }
+
+  .vf-frame {
+    height: 18vw;
+    max-height: 120px;
+    padding: 4px;
+  }
+
+  .vf-sprockets {
+    width: 12px;
+    padding: 10px 2px;
+    gap: 8px;
+  }
+
+  .vf-hole {
+    width: 6px;
+    height: 6px;
+    min-width: 6px;
+    min-height: 6px;
+  }
+
+  .vf-track {
+    gap: 1.5vw;
+    padding: 1.5vw 6px;
+  }
+
+
+}
+

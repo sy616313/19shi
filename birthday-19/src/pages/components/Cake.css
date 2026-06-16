@@ -368,3 +368,79 @@
     animation: none !important;
   }
 }
+
+/* ===== Mobile Portrait → Force Landscape fixes ===== */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  .cake-scene {
+    padding: 10px 0 5px;
+  }
+
+  .cake-body {
+    width: 160px;
+    height: 124px;
+  }
+
+  .cake-layer {
+    width: 140px;
+    height: 64px;
+  }
+
+  .cake-frosting-bottom {
+    width: 152px;
+    height: 22px;
+  }
+
+  .cake-cream-top {
+    width: 146px;
+    bottom: 62px;
+    height: 26px;
+  }
+
+  .cream-swirl {
+    width: 20px;
+    height: 18px;
+  }
+
+  .cream-swirl-1, .cream-swirl-5 {
+    height: 16px;
+    width: 20px;
+  }
+
+  .cream-swirl-3 {
+    height: 20px;
+    width: 24px;
+  }
+
+  .candle-stick {
+    height: 28px;
+    width: 5px;
+  }
+
+  .strawberry-slice {
+    width: 18px;
+    height: 12px;
+  }
+
+  .strawberry-s1 { top: 44px; left: 10px; }
+  .strawberry-s2 { top: 38px; left: 38px; width: 22px; }
+  .strawberry-s3 { top: 40px; right: 10px; }
+
+  .candle-ambient-glow {
+    width: 200px;
+    height: 200px;
+  }
+
+  .cake-stand {
+    width: 170px;
+    height: 8px;
+  }
+
+  .candle-container {
+    padding: 4px 14px 6px;
+  }
+
+  .candle-wax-drip {
+    top: 20px;
+    height: 6px;
+  }
+}

@@ -140,6 +140,14 @@
   }
 }
 
+
+@media (prefers-reduced-motion: reduce) {
+  .guide-text {
+    animation: none;
+  }
+}
+
+
 /* ===== Mobile Portrait → Force Landscape fixes ===== */
 @media screen and (max-width: 768px) and (orientation: portrait) {
   .birthday-page {
@@ -152,12 +160,11 @@
 
   .guide-overlay {
     position: absolute;
-    bottom: 8%;
+    bottom: 6%;
   }
-}
-@media (prefers-reduced-motion: reduce) {
-  .guide-text {
-    animation: none;
-  }
-}
 
+  .film-stage {
+    width: 38vw;
+    max-width: 240px;
+  }
+}
