@@ -1,15 +1,42 @@
-﻿import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
+
+/*
+ * Photorealistic black & white starfield.
+ * Visual parameters from qwen-vision analysis:
+ *   - Pure B&W, extreme contrast, exponential glow falloff
+ *   - Circular light points, slight cross diffraction on bright stars
+ *   - Size grades: tiny at top → larger at bottom (perspective depth)
+ *   - Dense horizontal band at lower 1/3 (star cluster / Milky Way core)
+ *   - Nebula cloud textures in mid-lower area
+ *   - Slight vignette (10-15% corner darkening)
+ *   - Clean, no film grain
+ */
+
+const BRIGHT_STAR_THRESHOLD = 0.7;
+const NEBULA_BLOBS = 7;
+const ATMOSPHERE_LAYERS = 3;
+
+function gaussRandom(mean = 0, stdev = 1) {
+  let u = 1 - Math.random();
+  let v = Math.random();
+  return mean + stdev * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+function clamp(v, lo, hi) {
+  return Math.max(lo, Math.min(hi, v));
+}
 
 export default function ParticleBg({ active = true }) {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: -999, y: -999 });
   const starsRef = useRef([]);
-  const animRef = useRef(null);
-
+  const nebulaeRef = useRef([]);
   const prefersReduced = useRef(false);
 
   useEffect(() => {
-    prefersReduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    prefersReduced.current = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
   }, []);
 
   const handleMouse = useCallback((e) => {
@@ -23,111 +50,292 @@ export default function ParticleBg({ active = true }) {
     let animId;
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      initStars();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      initAll();
     };
 
-    const initStars = () => {
-      const count = prefersReduced.current ? 60 : 150;
-      const arr = [];
+    const initAll = () => {
+      const w = canvas.width / (Math.min(window.devicePixelRatio || 1, 2));
+      const h = canvas.height / (Math.min(window.devicePixelRatio || 1, 2));
+      const count = prefersReduced.current ? 120 : 300;
+
+      // --- stars ---
+      const stars = [];
       for (let i = 0; i < count; i++) {
-        arr.push(createStar(true));
+        stars.push(createStar(w, h));
       }
-      starsRef.current = arr;
+      // Sort back-to-front for painter's algorithm (not strictly needed but clean)
+      stars.sort((a, b) => a.magnitude - b.magnitude);
+      starsRef.current = stars;
+
+      // --- nebula blobs ---
+      const nebulae = [];
+      // Dense core band at lower 1/3
+      for (let i = 0; i < NEBULA_BLOBS; i++) {
+        const t = i / (NEBULA_BLOBS - 1);
+        // Horizontal band centered around 70-85% height
+        const cy = h * (0.65 + t * 0.25);
+        const cx = w * (0.2 + Math.random() * 0.6);
+        const scale = 1 - Math.abs(t - 0.5) * 1.0;
+        nebulae.push({
+          x: cx,
+          y: cy,
+          rx: w * (0.28 + Math.random() * 0.35) * scale,
+          ry: h * (0.06 + Math.random() * 0.10) * scale,
+          baseAlpha: 0.015 + Math.random() * 0.04 * scale,
+          phase: Math.random() * Math.PI * 2,
+        });
+      }
+      nebulaeRef.current = nebulae;
     };
 
-    const createStar = (initY = false) => {
-      const w = canvas.width || window.innerWidth;
-      const h = canvas.height || window.innerHeight;
+    const createStar = (w, h) => {
+      // Luminosity function: many dim, few bright (power-law)
+      // Use inverse transform: magnitude ~1 means bright, ~0 means dim
+      const rawMag = Math.pow(Math.random(), 2.5);
+      // Map to visual magnitude scale
+      const magnitude = rawMag;
+
+      // Position: concentration increases toward bottom
+      // y-bias: stars cluster more densely in lower portion
+      const yBias = 0.5; // 0=uniform, 1=all at bottom
+      const y = h * Math.pow(Math.random(), 1 / (1 + yBias * 2));
+
+      const x = Math.random() * w;
+
+      // Radius: larger stars at bottom (perspective), also brighter stars are larger
+      const depthFactor = 0.3 + 0.7 * (y / h);
+      const baseRadius = 0.2 + magnitude * 2.8 * depthFactor;
+      const radius = clamp(baseRadius, 0.15, 3.5);
+
+      // Brightness: brighter at bottom (cluster density)
+      const baseAlpha = 0.08 + magnitude * 0.85 * depthFactor;
+
+      // Subtle vertical elongation for brightest stars (atmospheric refraction)
+      const elongation = magnitude > BRIGHT_STAR_THRESHOLD
+        ? 1 + (magnitude - BRIGHT_STAR_THRESHOLD) * 3.5
+        : 1;
+
+      // Diffraction spikes for bright stars
+      const hasSpikes = magnitude > BRIGHT_STAR_THRESHOLD * 1.1;
+      const spikeIntensity = hasSpikes
+        ? (magnitude - BRIGHT_STAR_THRESHOLD * 1.1) / (1 - BRIGHT_STAR_THRESHOLD * 1.1)
+        : 0;
+      const spikeAngle = Math.random() * Math.PI;
+
       return {
-        x: Math.random() * w,
-        y: initY ? Math.random() * h : -10,
-        r: Math.random() * 1.8 + 0.3,
-        baseAlpha: Math.random() * 0.6 + 0.3,
-        alpha: Math.random() * 0.6 + 0.3,
-        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        x,
+        y,
+        radius,
+        baseAlpha,
+        alpha: baseAlpha,
+        magnitude,
+        elongation,
+        hasSpikes,
+        spikeIntensity,
+        spikeAngle,
+        twinkleSpeed: 0.003 + Math.random() * 0.012 * (1 - magnitude * 0.5),
         twinkleOffset: Math.random() * Math.PI * 2,
-        driftX: prefersReduced.current ? 0 : (Math.random() - 0.5) * 0.15,
-        driftY: prefersReduced.current ? 0 : Math.random() * 0.1 + 0.03,
+        driftX: prefersReduced.current ? 0 : (Math.random() - 0.5) * 0.06,
+        driftY: prefersReduced.current ? 0 : Math.random() * 0.04 + 0.01,
       };
     };
 
-    const drawStarShape = (cx, cy, r, alpha) => {
+    // --- drawing helpers ---
+
+    const drawNebula = (n, timestamp) => {
       ctx.save();
-      ctx.globalAlpha = alpha;
-      // Glow
-      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, r * 4);
-      glow.addColorStop(0, `rgba(255,255,255,${alpha})`);
-      glow.addColorStop(0.3, `rgba(200,220,255,${alpha * 0.6})`);
-      glow.addColorStop(1, "rgba(255,255,255,0)");
-      ctx.fillStyle = glow;
+      const pulse = Math.sin(timestamp * 0.0003 + n.phase) * 0.3 + 0.7;
+      const alpha = n.baseAlpha * pulse;
+      const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, Math.max(n.rx, n.ry));
+      grad.addColorStop(0, `rgba(180,180,185,${alpha * 1.4})`);
+      grad.addColorStop(0.35, `rgba(140,140,145,${alpha})`);
+      grad.addColorStop(0.65, `rgba(90,90,95,${alpha * 0.5})`);
+      grad.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(cx, cy, r * 4, 0, Math.PI * 2);
-      ctx.fill();
-      // Core
-      ctx.fillStyle = "#FFFFFF";
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.ellipse(n.x, n.y, n.rx, n.ry, 0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     };
 
-    const drawStarFlare = (cx, cy, r, alpha, angle) => {
-      if (alpha < 0.5) return;
+    const drawStar = (s) => {
+      const alpha = s.alpha;
+      if (alpha < 0.015) return;
       ctx.save();
-      ctx.globalAlpha = alpha * 0.3;
-      ctx.strokeStyle = "rgba(200,220,255,0.5)";
-      ctx.lineWidth = 0.5;
-      const len = r * 8;
+
+      // Glow disc - exponential falloff
+      const glowRadius = s.radius * (3 + s.magnitude * 6);
+      const glow = ctx.createRadialGradient(
+        s.x, s.y, s.radius * 0.5,
+        s.x, s.y, glowRadius
+      );
+      const peakAlpha = Math.min(1, alpha);
+      glow.addColorStop(0, `rgba(255,255,255,${peakAlpha})`);
+      glow.addColorStop(0.08, `rgba(255,255,255,${peakAlpha * 0.75})`);
+      glow.addColorStop(0.25, `rgba(240,240,245,${peakAlpha * 0.3})`);
+      glow.addColorStop(0.55, `rgba(180,180,190,${peakAlpha * 0.06})`);
+      glow.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = glow;
+
+      if (s.elongation > 1.05) {
+        // Elongated glow (vertical)
+        ctx.beginPath();
+        ctx.ellipse(
+          s.x, s.y,
+          glowRadius, glowRadius * s.elongation,
+          0, 0, Math.PI * 2
+        );
+        ctx.fill();
+      } else {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Core point
+      const coreAlpha = Math.min(1, alpha * 1.2);
+      ctx.fillStyle = `rgba(255,255,255,${coreAlpha})`;
       ctx.beginPath();
-      ctx.moveTo(cx - Math.cos(angle) * len * 0.3, cy - Math.sin(angle) * len * 0.3);
-      ctx.lineTo(cx + Math.cos(angle) * len, cy + Math.sin(angle) * len);
-      ctx.stroke();
-      // cross flare
-      const a2 = angle + Math.PI / 2;
-      ctx.beginPath();
-      ctx.moveTo(cx - Math.cos(a2) * len * 0.4, cy - Math.sin(a2) * len * 0.4);
-      ctx.lineTo(cx + Math.cos(a2) * len * 0.7, cy + Math.sin(a2) * len * 0.7);
-      ctx.stroke();
+      if (s.elongation > 1.05) {
+        ctx.ellipse(
+          s.x, s.y,
+          s.radius, s.radius * s.elongation * 0.7,
+          0, 0, Math.PI * 2
+        );
+      } else {
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+      }
+      ctx.fill();
+
+      // Diffraction spikes
+      if (s.hasSpikes && s.alpha > 0.35) {
+        drawSpikes(s);
+      }
+
+      ctx.restore();
+    };
+
+    const drawSpikes = (s) => {
+      const intensity = s.spikeIntensity * Math.min(1, s.alpha);
+      if (intensity < 0.05) return;
+
+      ctx.save();
+      const spikeLen = s.radius * (6 + s.magnitude * 10);
+      const baseAngle = s.spikeAngle;
+
+      for (let arm = 0; arm < 4; arm++) {
+        const angle = baseAngle + (arm * Math.PI) / 2;
+        const cosA = Math.cos(angle);
+        const sinA = Math.sin(angle);
+
+        // Each spike: bright core, fading wings
+        const grad = ctx.createLinearGradient(
+          s.x - cosA * spikeLen * 0.2,
+          s.y - sinA * spikeLen * 0.2,
+          s.x + cosA * spikeLen,
+          s.y + sinA * spikeLen
+        );
+        grad.addColorStop(0, `rgba(255,255,255,${intensity * 0.7})`);
+        grad.addColorStop(0.06, `rgba(255,255,255,${intensity * 1.0})`);
+        grad.addColorStop(0.15, `rgba(255,255,255,${intensity * 0.5})`);
+        grad.addColorStop(0.4, `rgba(200,200,210,${intensity * 0.12})`);
+        grad.addColorStop(1, "rgba(0,0,0,0)");
+
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = s.radius * (0.3 + intensity * 0.7);
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(s.x + cosA * spikeLen, s.y + sinA * spikeLen);
+        ctx.stroke();
+      }
+      ctx.restore();
+    };
+
+    const drawVignette = (w, h) => {
+      ctx.save();
+      const grad = ctx.createRadialGradient(
+        w / 2, h * 0.45, Math.min(w, h) * 0.55,
+        w / 2, h * 0.45, Math.max(w, h) * 0.75
+      );
+      grad.addColorStop(0, "rgba(0,0,0,0)");
+      grad.addColorStop(0.7, "rgba(0,0,0,0.04)");
+      grad.addColorStop(1, "rgba(0,0,0,0.13)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+      ctx.restore();
+    };
+
+    const drawAtmosphere = (w, h, timestamp) => {
+      ctx.save();
+      // Subtle atmospheric gradient: slightly lighter near horizon
+      const atmGrad = ctx.createLinearGradient(0, h * 0.5, 0, h);
+      atmGrad.addColorStop(0, "rgba(0,0,0,0)");
+      atmGrad.addColorStop(0.5, "rgba(20,20,22,0.06)");
+      atmGrad.addColorStop(0.85, "rgba(30,30,33,0.10)");
+      atmGrad.addColorStop(1, "rgba(25,25,28,0.07)");
+      ctx.fillStyle = atmGrad;
+      ctx.fillRect(0, h * 0.5, w, h * 0.5);
       ctx.restore();
     };
 
     const animate = (timestamp) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const w = canvas.width / (Math.min(window.devicePixelRatio || 1, 2));
+      const h = canvas.height / (Math.min(window.devicePixelRatio || 1, 2));
       const mx = mouseRef.current.x;
       const my = mouseRef.current.y;
 
+      // Pure black canvas
+      ctx.fillStyle = "#000000";
+      ctx.fillRect(0, 0, w, h);
+
+      // Nebula clouds (behind stars)
+      nebulaeRef.current.forEach((n) => drawNebula(n, timestamp));
+
+      // Atmosphere layer
+      drawAtmosphere(w, h, timestamp);
+
+      // Stars
       starsRef.current.forEach((s) => {
         // Twinkle
-        s.alpha = s.baseAlpha + Math.sin(timestamp * s.twinkleSpeed + s.twinkleOffset) * 0.2;
-        s.alpha = Math.max(0.05, Math.min(1, s.alpha));
+        s.alpha =
+          s.baseAlpha +
+          Math.sin(timestamp * s.twinkleSpeed + s.twinkleOffset) *
+            0.12 *
+            (1 - s.magnitude * 0.4);
+        s.alpha = clamp(s.alpha, 0.01, 1);
 
-        // Mouse parallax - stars near cursor brighten
+        // Mouse proximity brightening
         if (mx > 0) {
           const dx = s.x - mx;
           const dy = s.y - my;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 200) {
-            s.alpha = Math.min(1, s.alpha + (1 - dist / 200) * 0.5);
+          if (dist < 160) {
+            s.alpha = Math.min(1, s.alpha + (1 - dist / 160) * 0.35);
           }
         }
 
-        // Drift
-        s.y += s.driftY;
+        // Slow drift
         s.x += s.driftX;
-        if (s.y > canvas.height + 10) {
-          Object.assign(s, createStar());
+        s.y += s.driftY;
+        if (s.y > h + 10) {
+          Object.assign(s, createStar(w, h));
           s.y = -10;
+          s.x = Math.random() * w;
         }
-        if (s.x < -10) s.x = canvas.width + 10;
-        if (s.x > canvas.width + 10) s.x = -10;
+        if (s.x < -10) s.x = w + 10;
+        if (s.x > w + 10) s.x = -10;
 
-        drawStarShape(s.x, s.y, s.r, s.alpha);
-        if (s.r > 1.3) {
-          drawStarFlare(s.x, s.y, s.r, s.alpha, timestamp * 0.0005 + s.twinkleOffset);
-        }
+        drawStar(s);
       });
+
+      // Vignette overlay (topmost)
+      drawVignette(w, h);
 
       animId = requestAnimationFrame(animate);
     };
@@ -155,7 +363,6 @@ export default function ParticleBg({ active = true }) {
         height: "100%",
         pointerEvents: "none",
         zIndex: 0,
-        background: "radial-gradient(ellipse at 50% 45%, #1A1030 0%, #0C0C1A 40%, #06060F 100%)",
       }}
     />
   );
