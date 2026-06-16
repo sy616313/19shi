@@ -43,8 +43,8 @@
   --transition-normal: 400ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 600ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  --font-display: "Playfair Display", "Georgia", "Noto Serif SC", serif;
-  --font-body: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-display: ""Playfair Display"", ""Georgia"", ""Noto Serif SC"", serif;
+  --font-body: ""Inter"", ""Segoe UI"", ""PingFang SC"", ""Microsoft YaHei"", sans-serif;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -79,4 +79,20 @@ body {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* ===== Mobile Portrait → Force Landscape ===== */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  html, body {
+    overflow: hidden;
+  }
+
+  #root {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100vh;
+    height: 100vw;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
 }
