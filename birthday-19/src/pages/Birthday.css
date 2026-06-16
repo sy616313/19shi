@@ -140,8 +140,24 @@
   }
 }
 
+/* ===== Mobile Portrait → Force Landscape fixes ===== */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  .birthday-page {
+    min-height: 100%;
+  }
+
+  .birthday-overlay {
+    position: absolute;
+  }
+
+  .guide-overlay {
+    position: absolute;
+    bottom: 8%;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .guide-text {
     animation: none;
   }
 }
+

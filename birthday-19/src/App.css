@@ -22,3 +22,10 @@
   border-radius: 2px;
   opacity: 0.4;
 }
+
+/* ===== Mobile Portrait → Force Landscape fixes ===== */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  .main-content {
+    height: 100%;
+  }
+}

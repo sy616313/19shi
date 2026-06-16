@@ -125,3 +125,10 @@
     font-size: 9px;
   }
 }
+
+/* Mobile Portrait → Force Landscape fixes */
+@media screen and (max-width: 768px) and (orientation: portrait) {
+  .sidebar {
+    position: absolute;
+  }
+}
