@@ -1,4 +1,4 @@
-﻿/* ===== Vertical Film Strip — JS-driven seamless scroll ===== */
+/* ===== Vertical Film Strip — 1:1 film replica (qwen params) ===== */
 
 .vertical-film {
   position: relative;
@@ -7,128 +7,205 @@
   height: 100vh;
   display: flex;
   align-items: stretch;
-  background: linear-gradient(180deg, rgba(16,16,16,0.92) 0%, rgba(24,24,24,0.88) 50%, rgba(16,16,16,0.92) 100%);
-  border-left: 1px solid rgba(255,255,255,0.04);
+  /* Warm dark brown film base — matte with subtle highlight */
+  background: linear-gradient(
+    180deg,
+    #1A0E0E 0%,
+    #231515 15%,
+    #1E1111 40%,
+    #241616 65%,
+    #1A0E0E 100%
+  );
+  border-left: 1px solid rgba(255, 255, 255, 0.03);
   overflow: hidden;
+  /* Film grain overlay */
+  isolation: isolate;
 }
 
+/* Film grain + subtle texture */
+.vertical-film::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.18;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+
+/* Sprocket columns */
 .vf-sprockets {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
-  padding: 14px 4px;
-  width: 16px;
+  gap: 12px;
+  padding: 16px 4px;
+  width: 18px;
   flex-shrink: 0;
   z-index: 2;
+  position: relative;
 }
 
+.vf-sprockets-left  { border-right: 1px solid rgba(255, 255, 255, 0.03); }
+.vf-sprockets-right { border-left:  1px solid rgba(255, 255, 255, 0.03); }
+
+/* Square sprocket hole — qwen: 8-10px square, rounded corners */
 .vf-hole {
   display: block;
-  width: 7px;
-  height: 7px;
-  min-height: 7px;
+  width: 9px;
+  height: 9px;
+  min-width: 9px;
+  min-height: 9px;
   flex-shrink: 0;
-  background: radial-gradient(circle, #333 0%, #1a1a1a 50%, #0a0a0a 100%);
-  border-radius: 50%;
-  border: 1px solid #1f1f1f;
+  /* Deep punched hole: dark center, slight edge highlight */
+  background:
+    radial-gradient(circle at 45% 40%, rgba(60, 45, 40, 0.6) 0%, #0C0606 60%, #050202 100%);
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.7);
+  box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(80, 60, 50, 0.15);
+  transition: box-shadow 0.3s ease;
 }
 
-.vf-sprockets-left { border-right: 1px solid rgba(255,255,255,0.02); }
-.vf-sprockets-right { border-left: 1px solid rgba(255,255,255,0.02); }
-
-/* Frames track — JS drives scroll, no CSS animation */
+/* ── Frames track — JS-driven vertical scroll ── */
 .vf-track {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 3vh;
-  padding: 2vh 10px;
+  gap: 2.5vh;
+  padding: 2.5vh 12px;
   will-change: transform;
 }
 
-/* Single frame */
+/* Single frame — thick border, embossed inset */
 .vf-frame {
   flex-shrink: 0;
-  width: calc(100% - 8px);
+  width: calc(100% - 6px);
   height: 28vh;
   max-height: 260px;
-  background: #0a0a0a;
-  border-radius: 6px;
-  padding: 5px;
+  /* Film frame border: deep black-brown, thick */
+  background: #0A0606;
+  border-radius: 3px;
+  padding: 6px;
   box-shadow:
-    0 3px 12px rgba(0,0,0,0.5),
-    inset 0 0 0 1px rgba(255,255,255,0.03);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+    0 2px 8px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 2px #150C0C,
+    inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .vf-frame:hover {
-  transform: scale(1.03);
+  transform: scale(1.025);
   box-shadow:
-    0 6px 24px rgba(0,0,0,0.6),
-    inset 0 0 0 1px rgba(255,255,255,0.06);
+    0 4px 16px rgba(0, 0, 0, 0.65),
+    inset 0 0 0 2px #1A0E0E,
+    inset 0 1px 3px rgba(0, 0, 0, 0.4);
   z-index: 2;
 }
 
+/* Photo area — embossed inset look */
 .vf-photo {
   width: 100%;
   height: 100%;
-  border-radius: 3px;
+  border-radius: 2px;
   position: relative;
   overflow: hidden;
+  /* Inner shadow for embossed depth */
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
+/* Photo overlay — subtle film sheen */
 .vf-photo-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     135deg,
-    rgba(255,255,255,0.04) 0%,
-    transparent 50%,
-    rgba(0,0,0,0.08) 100%
+    rgba(255, 255, 255, 0.03) 0%,
+    transparent 45%,
+    rgba(0, 0, 0, 0.06) 100%
   );
   pointer-events: none;
 }
 
+/* Frame number — film-style counter */
 .vf-frame-num {
   position: absolute;
-  bottom: 4px;
-  right: 6px;
+  bottom: 5px;
+  right: 7px;
   font-size: 9px;
   font-family: "Courier New", monospace;
-  color: rgba(255,255,255,0.3);
+  color: rgba(200, 180, 160, 0.35);
   letter-spacing: 1px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
 }
 
-/* Top/bottom vignette */
-.vertical-film::before,
+/* ── Scratches — sparse white lines ── */
+.vf-scratches {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.12;
+}
+
+.vf-scratch {
+  position: absolute;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.5);
+  transform: rotate(-2deg);
+}
+
+/* ── Bokeh light spots at bottom ── */
+.vf-bokeh {
+  position: absolute;
+  bottom: 20px;
+  z-index: 3;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(8px);
+}
+
+/* ── Vignette ── */
 .vertical-film::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  height: 50px;
   z-index: 3;
   pointer-events: none;
 }
-.vertical-film::before {
-  top: 0;
-  background: linear-gradient(180deg, rgba(16,16,16,0.95) 0%, transparent 100%);
-}
+
 .vertical-film::after {
   bottom: 0;
-  background: linear-gradient(0deg, rgba(16,16,16,0.95) 0%, transparent 100%);
+  height: 60px;
+  background: linear-gradient(0deg, rgba(18, 10, 10, 0.95) 0%, transparent 100%);
 }
 
+/* Top vignette via wrapper */
+.vf-top-vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(18, 10, 10, 0.95) 0%, transparent 100%);
+}
+
+/* ── MotionCraft: responsive ── */
 @media (max-width: 768px) {
   .vertical-film { width: 45vw; max-width: 300px; }
-  .vf-frame { height: 24vh; max-height: 200px; }
-  .vf-sprockets { width: 12px; padding: 10px 2px; gap: 8px; }
-  .vf-hole { width: 5px; height: 5px; min-height: 5px; }
-  .vf-track { gap: 2vh; padding: 1.5vh 6px; }
+  .vf-frame { height: 24vh; max-height: 200px; padding: 5px; }
+  .vf-sprockets { width: 14px; padding: 12px 2px; gap: 10px; }
+  .vf-hole { width: 7px; height: 7px; min-width: 7px; min-height: 7px; }
+  .vf-track { gap: 2vh; padding: 2vh 8px; }
 }
 
 @media (max-width: 480px) {

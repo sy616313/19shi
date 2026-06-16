@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import "./VerticalFilm.css";
 
 const placeholderGradients = [
@@ -12,8 +12,25 @@ const placeholderGradients = [
   "linear-gradient(135deg, #263238 0%, #37474F 50%, #78909C 100%)",
 ];
 
-// Duplicate once = 16 frames total for seamless loop
 const frames = [...placeholderGradients, ...placeholderGradients];
+
+// Random scratches for film aging
+const scratches = [
+  { top: "8%",  left: "15%", width: "60px" },
+  { top: "22%", left: "60%", width: "40px" },
+  { top: "35%", left: "8%",  width: "75px" },
+  { top: "50%", left: "70%", width: "35px" },
+  { top: "68%", left: "20%", width: "55px" },
+  { top: "82%", left: "55%", width: "45px" },
+];
+
+// Bokeh light spots at bottom
+const bokehs = [
+  { left: "18%", size: 28, alpha: 0.12, color: "rgba(200,160,120" },
+  { left: "35%", size: 40, alpha: 0.08, color: "rgba(220,180,140" },
+  { left: "55%", size: 22, alpha: 0.14, color: "rgba(180,140,100" },
+  { left: "72%", size: 34, alpha: 0.09, color: "rgba(210,170,130" },
+];
 
 export default function VerticalFilm() {
   const trackRef = useRef(null);
@@ -28,18 +45,15 @@ export default function VerticalFilm() {
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) return;
 
-    const speed = 0.15; // pixels per frame
+    const speed = 0.15;
 
     const animate = () => {
       if (!pausedRef.current) {
         scrollRef.current += speed;
-
-        // Total height of one set (8 frames) — reset seamlessly
         const singleSetHeight = track.scrollHeight / 2;
         if (scrollRef.current >= singleSetHeight) {
           scrollRef.current -= singleSetHeight;
         }
-
         track.style.transform = `translateY(${-scrollRef.current}px)`;
       }
       animRef.current = requestAnimationFrame(animate);
@@ -61,6 +75,35 @@ export default function VerticalFilm() {
 
   return (
     <div className="vertical-film" aria-label="回忆胶卷">
+      {/* Top vignette */}
+      <div className="vf-top-vignette" aria-hidden="true" />
+
+      {/* Scratches */}
+      <div className="vf-scratches" aria-hidden="true">
+        {scratches.map((s, i) => (
+          <span
+            key={`scratch-${i}`}
+            className="vf-scratch"
+            style={{ top: s.top, left: s.left, width: s.width }}
+          />
+        ))}
+      </div>
+
+      {/* Bokeh spots */}
+      {bokehs.map((b, i) => (
+        <span
+          key={`bokeh-${i}`}
+          className="vf-bokeh"
+          aria-hidden="true"
+          style={{
+            left: b.left,
+            width: b.size,
+            height: b.size,
+            background: `radial-gradient(circle, ${b.color},${b.alpha}) 0%, transparent 100%)`,
+          }}
+        />
+      ))}
+
       {/* Left sprocket holes */}
       <div className="vf-sprockets vf-sprockets-left" aria-hidden="true">
         {Array.from({ length: 22 }, (_, i) => (
@@ -68,7 +111,7 @@ export default function VerticalFilm() {
         ))}
       </div>
 
-      {/* Photo frames — JS-driven seamless scroll */}
+      {/* Photo frames */}
       <div className="vf-track" ref={trackRef}>
         {frames.map((gradient, i) => (
           <div key={i} className="vf-frame">
