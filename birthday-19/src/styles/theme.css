@@ -82,41 +82,51 @@ body {
 }
 
 /* ===== Mobile Portrait → Rotate Prompt ===== */
-@media screen and (max-width: 768px) and (orientation: portrait) {
-  #root {
-    display: none;
-  }
+#rotate-prompt {
+  display: none;
+}
 
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background: radial-gradient(ellipse at center, #1A1030 0%, #06060F 70%);
-  }
+body.is-portrait #root {
+  display: none;
+}
 
-  body::after {
-    content: "\21BB  请旋转手机";
-    position: fixed;
-    inset: 0;
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #FDE68A;
-    font-family: "Playfair Display", "Georgia", "Noto Serif SC", serif;
-    font-size: 1.35rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-align: center;
-    text-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
-    animation: rotatePulse 2s ease-in-out infinite;
-    pointer-events: none;
-    user-select: none;
-  }
+body.is-portrait #rotate-prompt {
+  display: flex;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: radial-gradient(ellipse at center, #1A1030 0%, #06060F 70%);
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
 
-  @keyframes rotatePulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
-  }
+.rp-icon {
+  font-size: 3rem;
+  color: #FDE68A;
+  animation: rotateIcon 2s ease-in-out infinite;
+  text-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
+}
+
+.rp-text {
+  color: #FDE68A;
+  font-family: "Playfair Display", "Georgia", "Noto Serif SC", serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 30px rgba(245, 158, 11, 0.5);
+  animation: rotateTextPulse 2s ease-in-out infinite;
+}
+
+@keyframes rotateIcon {
+  0%, 100% { transform: rotate(0deg); opacity: 0.7; }
+  50% { transform: rotate(-90deg); opacity: 1; }
+}
+
+@keyframes rotateTextPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
