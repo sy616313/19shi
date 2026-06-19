@@ -1,2 +1,0 @@
-﻿import './Placeholder.css';
-export default function Letter() { return (<div className="placeholder-page"><div className="placeholder-icon">✉️</div><div className="placeholder-title">一封信</div><div className="placeholder-subtitle">待写入 — 打字机效果即将呈现</div><div style={{marginTop:12,width:200,height:120,border:'2px dashed var(--color-primary-light)',borderRadius:'var(--radius-md)',background:'rgba(255,255,255,0.4)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:40}}>💌</div></div>); }
