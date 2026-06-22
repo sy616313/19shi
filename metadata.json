@@ -1,0 +1,6 @@
+{
+  "name": "3D Particle Cake Gesture Controller",
+  "description": "A real-time hand-tracking interactive 3D particle cake driven by Three.js and MediaPipe Hands.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
